@@ -156,7 +156,6 @@
 
 
 
-
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -172,6 +171,7 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
+// 🟢 UPDATE THIS MATCHER TO IGNORE THE API FOLDER:
 export const config = {
-  matcher: ["/((?!_next).*)"],
+  matcher: ["/((?!api|_next|favicon.ico).*)"],
 };
