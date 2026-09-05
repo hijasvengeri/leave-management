@@ -232,8 +232,6 @@
 //   return user;
 // }
 
-
-
 import { supabase } from "./supabase";
 
 export async function loginUser(username: string, password: string) {
@@ -253,4 +251,13 @@ export async function loginUser(username: string, password: string) {
   }
 
   return user;
+}
+
+// 🟢 ADD THIS MISSING FUNCTION AT THE BOTTOM:
+export async function logoutUser() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(error.message);
+  }
+  return true;
 }
