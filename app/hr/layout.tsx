@@ -131,7 +131,7 @@ import { useState, useEffect } from "react";
 const { Header, Sider, Content } = Layout;
 const { Text, Title } = Typography;
 
-export default async function HRLayout({
+export default function HRLayout({
   children,
 }: {
   children: React.ReactNode;
