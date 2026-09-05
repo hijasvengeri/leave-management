@@ -206,221 +206,233 @@
 
 
 
-"use client";
+// "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { Card, Row, Col, List, Tag } from "antd";
-import dayjs from "dayjs";
+// import { useEffect, useState } from "react";
+// import { supabase } from "@/lib/supabase";
+// import { Card, Row, Col, List, Tag } from "antd";
+// import dayjs from "dayjs";
 
-export default function HRDashboard() {
-    const [staff, setStaff] = useState<any[]>([]);
-    const [leaves, setLeaves] = useState<any[]>([]);
+// export default function HRDashboard() {
+//     const [staff, setStaff] = useState<any[]>([]);
+//     const [leaves, setLeaves] = useState<any[]>([]);
 
-    // ================= FETCH STAFF =================
-    const fetchStaff = async () => {
-        const { data } = await supabase
-            .schema("leave_management")
-            .from("employees")
-            .select("*")
-            .eq("role", "staff");
+//     // ================= FETCH STAFF =================
+//     const fetchStaff = async () => {
+//         const { data } = await supabase
+//             .schema("leave_management")
+//             .from("employees")
+//             .select("*")
+//             .eq("role", "staff");
 
-        setStaff(data || []);
-    };
+//         setStaff(data || []);
+//     };
 
-    // ================= FETCH LEAVES =================
-    const fetchLeaves = async () => {
-        const { data } = await supabase
-            .schema("leave_management")
-            .from("leaves")
-            .select("*")
-
-
-        setLeaves(data || []);
-    };
-
-    useEffect(() => {
-        fetchStaff();
-        fetchLeaves();
-    }, []);
-
-    // ================= DATE FILTERS =================
-    const today = dayjs().format("YYYY-MM-DD");
-    const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
-
-    const todayLeaves = leaves.filter(
-        (l) => l.leave_date === today
-    );
-
-    const tomorrowLeaves = leaves.filter(
-        (l) => l.leave_date === tomorrow
-    );
-
-    // const pendingLeavesCount = leaves.filter(
-    //     (l) => l.status === "pending"
-    // ).length;
-    const pendingLeavesCount = Array.from(
-        new Set(
-            leaves
-                .filter((l) => l.status === "pending")
-                .map((l) => `${l.employee_id}-${l.leave_date}`)
-        )
-    ).length;
-
-    // Collapse multiple half-day rows into one per employee per day
-    const getUniqueLeaves = (leavesArray: any[]) => {
-        const map = new Map();
-        leavesArray.forEach((item) => {
-            const key = `${item.employee_id}-${item.leave_date}`;
-            if (!map.has(key)) {
-                map.set(key, { ...item, displayHalf: item.half, hasPending: item.status === 'pending' });
-            } else {
-                const existing = map.get(key);
-                if (existing.half !== item.half) {
-                    existing.displayHalf = "Full Day";
-                }
-                // If any part of the day is pending, mark the whole entry as pending
-                if (item.status === 'pending') {
-                    existing.hasPending = true;
-                }
-            }
-        });
-        return Array.from(map.values());
-    };
-
-    const uniqueToday = getUniqueLeaves(todayLeaves);
-    const uniqueTomorrow = getUniqueLeaves(tomorrowLeaves);
+//     // ================= FETCH LEAVES =================
+//     const fetchLeaves = async () => {
+//         const { data } = await supabase
+//             .schema("leave_management")
+//             .from("leaves")
+//             .select("*")
 
 
-    return (
-        <div style={{ padding: 20 }}>
-            {/* ================= KPI CARDS ================= */}
-            <Row gutter={16}>
-                <Col span={6}>
-                    <Card>
-                        <h3>Active Staff</h3>
-                        <h2>{staff.filter((s) => s.active).length}</h2>
-                    </Card>
-                </Col>
+//         setLeaves(data || []);
+//     };
 
-                <Col span={6}>
-                    <Card>
-                        <h3>Pending Leaves</h3>
-                        <h2>{pendingLeavesCount}</h2>
-                    </Card>
-                </Col>
+//     useEffect(() => {
+//         fetchStaff();
+//         fetchLeaves();
+//     }, []);
 
-                <Col span={6}>
-                    <Card>
-                        <h3>Today Leaves</h3>
-                        <h2>{todayLeaves.length}</h2>
-                    </Card>
-                </Col>
+//     // ================= DATE FILTERS =================
+//     const today = dayjs().format("YYYY-MM-DD");
+//     const tomorrow = dayjs().add(1, "day").format("YYYY-MM-DD");
 
-                <Col span={6}>
-                    <Card>
-                        <h3>Tomorrow Leaves</h3>
-                        <h2>{tomorrowLeaves.length}</h2>
-                    </Card>
-                </Col>
-            </Row>
+//     const todayLeaves = leaves.filter(
+//         (l) => l.leave_date === today
+//     );
 
-            {/* ================= TODAY LEAVES ================= */}
-            <Row gutter={16} style={{ marginTop: 20 }}>
-                <Col span={12}>
-                    <Card title="📅 Today Leave Staff">
-                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                            {todayLeaves.length === 0 ? (
-                                <div style={{ color: "#888" }}>No leaves today</div>
-                            ) : (
-                                todayLeaves.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        style={{
-                                            padding: 12,
-                                            border: "1px solid #eee",
-                                            borderRadius: 10,
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        {/* LEFT SIDE */}
-                                        <div>
-                                            <b>{item.employee_name}</b>
+//     const tomorrowLeaves = leaves.filter(
+//         (l) => l.leave_date === tomorrow
+//     );
 
-                                            <div style={{ fontSize: 12, color: "#666" }}>
-                                                {item.type} • {item.reason}
-                                            </div>
+//     // const pendingLeavesCount = leaves.filter(
+//     //     (l) => l.status === "pending"
+//     // ).length;
+//     const pendingLeavesCount = Array.from(
+//         new Set(
+//             leaves
+//                 .filter((l) => l.status === "pending")
+//                 .map((l) => `${l.employee_id}-${l.leave_date}`)
+//         )
+//     ).length;
 
-                                            {/* NEW INFO */}
-                                            <div style={{ fontSize: 12, marginTop: 4 }}>
-                                                <span style={{ color: "#1677ff" }}>
-                                                    Dept: {item.department || "N/A"}
-                                                </span>
-                                                {" | "}
-                                                <span style={{ color: "#fa541c" }}>
-                                                    Handover: {item.handover_name || "N/A"}
-                                                </span>
-                                            </div>
-                                        </div>
+//     // Collapse multiple half-day rows into one per employee per day
+//     const getUniqueLeaves = (leavesArray: any[]) => {
+//         const map = new Map();
+//         leavesArray.forEach((item) => {
+//             const key = `${item.employee_id}-${item.leave_date}`;
+//             if (!map.has(key)) {
+//                 map.set(key, { ...item, displayHalf: item.half, hasPending: item.status === 'pending' });
+//             } else {
+//                 const existing = map.get(key);
+//                 if (existing.half !== item.half) {
+//                     existing.displayHalf = "Full Day";
+//                 }
+//                 // If any part of the day is pending, mark the whole entry as pending
+//                 if (item.status === 'pending') {
+//                     existing.hasPending = true;
+//                 }
+//             }
+//         });
+//         return Array.from(map.values());
+//     };
 
-                                        {/* RIGHT TAG */}
-                                        <div style={{ fontSize: 12, color: "#fa8c16", fontWeight: 600 }}>
-                                            TODAY
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </Card>
-                </Col>
+//     const uniqueToday = getUniqueLeaves(todayLeaves);
+//     const uniqueTomorrow = getUniqueLeaves(tomorrowLeaves);
 
-                <Col span={12}>
-                    <Card title="📅 Tomorrow Leave Staff">
-                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                            {uniqueTomorrow.length === 0 ? (
-                                <div style={{ color: "#888" }}>No leaves tomorrow</div>
-                            ) : (
-                                uniqueTomorrow.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        style={{
-                                            padding: 12,
-                                            border: "1px solid #eee",
-                                            borderRadius: 10,
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <div>
-                                            <b>{item.employee_name}</b>
-                                            <div style={{ fontSize: 12, color: "#666" }}>
-                                                {item.displayHalf} • {item.reason}
-                                            </div>
-                                            <div style={{ fontSize: 12, marginTop: 4 }}>
-                                                <span style={{ color: "#1677ff" }}>Dept: {item.department || "N/A"}</span>
-                                                {" | "}
-                                                <span style={{ color: "#13c2c2" }}>Handover: {item.handover_name || "N/A"}</span>
-                                            </div>
-                                        </div>
 
-                                        {/* RIGHT TAG */}
-                                        <div style={{
-                                            fontSize: 11,
-                                            color: item.hasPending ? "#ff4d4f" : "#1677ff", // Red if pending, Blue if approved
-                                            fontWeight: 700
-                                        }}>
-                                            {item.hasPending ? "WITHOUT APPROVAL" : "TOMORROW"}
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </Card>
-                </Col>
-            </Row>
-        </div>
-    );
+//     return (
+//         <div style={{ padding: 20 }}>
+//             {/* ================= KPI CARDS ================= */}
+//             <Row gutter={16}>
+//                 <Col span={6}>
+//                     <Card>
+//                         <h3>Active Staff</h3>
+//                         <h2>{staff.filter((s) => s.active).length}</h2>
+//                     </Card>
+//                 </Col>
+
+//                 <Col span={6}>
+//                     <Card>
+//                         <h3>Pending Leaves</h3>
+//                         <h2>{pendingLeavesCount}</h2>
+//                     </Card>
+//                 </Col>
+
+//                 <Col span={6}>
+//                     <Card>
+//                         <h3>Today Leaves</h3>
+//                         <h2>{todayLeaves.length}</h2>
+//                     </Card>
+//                 </Col>
+
+//                 <Col span={6}>
+//                     <Card>
+//                         <h3>Tomorrow Leaves</h3>
+//                         <h2>{tomorrowLeaves.length}</h2>
+//                     </Card>
+//                 </Col>
+//             </Row>
+
+//             {/* ================= TODAY LEAVES ================= */}
+//             <Row gutter={16} style={{ marginTop: 20 }}>
+//                 <Col span={12}>
+//                     <Card title="📅 Today Leave Staff">
+//                         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+//                             {todayLeaves.length === 0 ? (
+//                                 <div style={{ color: "#888" }}>No leaves today</div>
+//                             ) : (
+//                                 todayLeaves.map((item) => (
+//                                     <div
+//                                         key={item.id}
+//                                         style={{
+//                                             padding: 12,
+//                                             border: "1px solid #eee",
+//                                             borderRadius: 10,
+//                                             display: "flex",
+//                                             justifyContent: "space-between",
+//                                             alignItems: "center",
+//                                         }}
+//                                     >
+//                                         {/* LEFT SIDE */}
+//                                         <div>
+//                                             <b>{item.employee_name}</b>
+
+//                                             <div style={{ fontSize: 12, color: "#666" }}>
+//                                                 {item.type} • {item.reason}
+//                                             </div>
+
+//                                             {/* NEW INFO */}
+//                                             <div style={{ fontSize: 12, marginTop: 4 }}>
+//                                                 <span style={{ color: "#1677ff" }}>
+//                                                     Dept: {item.department || "N/A"}
+//                                                 </span>
+//                                                 {" | "}
+//                                                 <span style={{ color: "#fa541c" }}>
+//                                                     Handover: {item.handover_name || "N/A"}
+//                                                 </span>
+//                                             </div>
+//                                         </div>
+
+//                                         {/* RIGHT TAG */}
+//                                         <div style={{ fontSize: 12, color: "#fa8c16", fontWeight: 600 }}>
+//                                             TODAY
+//                                         </div>
+//                                     </div>
+//                                 ))
+//                             )}
+//                         </div>
+//                     </Card>
+//                 </Col>
+
+//                 <Col span={12}>
+//                     <Card title="📅 Tomorrow Leave Staff">
+//                         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+//                             {uniqueTomorrow.length === 0 ? (
+//                                 <div style={{ color: "#888" }}>No leaves tomorrow</div>
+//                             ) : (
+//                                 uniqueTomorrow.map((item) => (
+//                                     <div
+//                                         key={item.id}
+//                                         style={{
+//                                             padding: 12,
+//                                             border: "1px solid #eee",
+//                                             borderRadius: 10,
+//                                             display: "flex",
+//                                             justifyContent: "space-between",
+//                                             alignItems: "center",
+//                                         }}
+//                                     >
+//                                         <div>
+//                                             <b>{item.employee_name}</b>
+//                                             <div style={{ fontSize: 12, color: "#666" }}>
+//                                                 {item.displayHalf} • {item.reason}
+//                                             </div>
+//                                             <div style={{ fontSize: 12, marginTop: 4 }}>
+//                                                 <span style={{ color: "#1677ff" }}>Dept: {item.department || "N/A"}</span>
+//                                                 {" | "}
+//                                                 <span style={{ color: "#13c2c2" }}>Handover: {item.handover_name || "N/A"}</span>
+//                                             </div>
+//                                         </div>
+
+//                                         {/* RIGHT TAG */}
+//                                         <div style={{
+//                                             fontSize: 11,
+//                                             color: item.hasPending ? "#ff4d4f" : "#1677ff", // Red if pending, Blue if approved
+//                                             fontWeight: 700
+//                                         }}>
+//                                             {item.hasPending ? "WITHOUT APPROVAL" : "TOMORROW"}
+//                                         </div>
+//                                     </div>
+//                                 ))
+//                             )}
+//                         </div>
+//                     </Card>
+//                 </Col>
+//             </Row>
+//         </div>
+//     );
+// }
+
+
+
+
+
+export default function Asffgh() {
+  return (
+    <div>
+      This is HR page
+    </div>
+  );
 }
